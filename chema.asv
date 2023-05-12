@@ -1,0 +1,7 @@
+filename = "";
+
+Vide
+
+while hasFrame(VideoReader)
+    videoFrame = readFrame(VideoReader);
+    depVideoPlayer(videoFrame);
