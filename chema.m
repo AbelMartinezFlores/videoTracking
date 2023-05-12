@@ -3,6 +3,8 @@ videoPlayer = vision.DeployableVideoPlayer;
 videoPlayer.Size = "Custom";
 videoPlayer.CustomSize = [1024 576];
 
+faceDetector=vision.CascadeObjectDetector();
+
 idx = 1;
 while hasFrame(videoReader)
     currentFrame = readFrame(videoReader,idx);
