@@ -1,7 +1,14 @@
-filename = "";
+videoReader = VideoReader('obj 1.mp4');
+videoPlayer = vision.DeployableVideoPlayer;
+videoPlayer.Size = "Custom";
+videoPlayer.CustomSize = [1024 576];
 
-Vide
+idx = 1;
+while hasFrame(videoReader)
+    tFrame = readFrame(videoReader);
+    nextFrame = readFrame(videoReader,1);
 
-while hasFrame(VideoReader)
-    videoFrame = readFrame(VideoReader);
-    depVideoPlayer(videoFrame);
+    videoPlayer(videoFrame);
+    pause(1/videoReader.FrameRate);
+end
+release(videoPlayer);

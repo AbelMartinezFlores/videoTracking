@@ -3,9 +3,16 @@ videoPlayer = vision.DeployableVideoPlayer;
 videoPlayer.Size = "Custom";
 videoPlayer.CustomSize = [1024 576];
 
+idx = 1;
 while hasFrame(videoReader)
-    videoFrame = readFrame(videoReader);
+    currentFrame = readFrame(videoReader,idx);
+
+    if idx!=1
+        lastFrame = readFrame(videoReader);
+    end
+
     videoPlayer(videoFrame);
     pause(1/videoReader.FrameRate);
+    idx = idx+1;
 end
 release(videoPlayer);
