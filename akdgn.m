@@ -2,7 +2,7 @@
 faceDetector = vision.CascadeObjectDetector();
 
 % Read a video frame and run the face detector.
-videoReader = VideoReader("obj 3.mp4");
+videoReader = VideoReader("obj 2.mp4");
 videoFrame      = readFrame(videoReader);
 %bbox            = step(faceDetector, videoFrame);
 
