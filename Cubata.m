@@ -1,0 +1,101 @@
+close all;
+clc;
+clear all;
+
+recortado = false;
+transform = [
+    1 0 0
+    0 1 0
+    0 0 1
+];
+
+videoReader = VideoReader('caras 2.avi');
+videoPlayer = vision.VideoPlayer('Position',[100,100,680,520]);
+indice = 1;
+numFrames = videoReader.NumFrames;
+videoFrame      = readFrame(videoReader);
+figure; imshow(videoFrame);
+
+
+while hasFrame(videoReader)
+
+      if( recortado == false)
+        waitforbuttonpress;
+    end
+
+    % Obtener información sobre la tecla presionada
+    key = get(gcf, 'CurrentCharacter');
+    disp(key)
+
+    if (key == 'd' & recortado == false & indice < numFrames )
+        indice = indice + 1;
+        disp(indice);
+        % Leer el siguiente fotograma
+        videoFrame = read(videoReader, indice);
+        % Mostrar el fotograma
+        imshow(videoFrame);
+        
+    end
+
+     if (key == 'a' & recortado == false & indice > 1)
+        indice = indice - 1;
+        disp(indice);
+        % Leer el siguiente fotograma
+        videoFrame = read(videoReader, indice);
+        % Mostrar el fotograma
+        imshow(videoFrame);
+    end
+
+    if (key == 'w' & recortado == false)
+        [a,b,c,d]=imcrop(videoFrame);
+    
+        videoFrame = readFrame(videoReader);
+        objectRegion =d;
+        points = detectMinEigenFeatures(im2gray(videoFrame),'ROI',objectRegion);
+        pointImage = insertMarker(videoFrame,points.Location,'+','Color','white');
+        figure,
+        imshow(pointImage);
+        title('Detected interest points');
+        tracker = vision.PointTracker('MaxBidirectionalError',3);
+        initialize(tracker,points.Location,videoFrame);
+        viejos=points.Location;
+        bboxPoints = bbox2points(d(1, :));
+         recortado = true;
+    end
+
+     if recortado == true
+         videoFrame = readFrame(videoReader);
+      [points,validity] = tracker(videoFrame);
+          visiblePoints = points(validity, :);
+        oldInliers = viejos(validity, :);
+        
+      if size(visiblePoints, 1) >= 2
+      [xform, inlierIdx] = estimateGeometricTransform2D(oldInliers,visiblePoints, "similarity", "MaxDistance", 4);
+            oldInliers    = oldInliers(inlierIdx, :);
+            visiblePoints = visiblePoints(inlierIdx, :);
+      bboxPoints = transformPointsForward(xform, bboxPoints);
+
+      
+
+      bboxPolygon = reshape(bboxPoints', 1, []);
+      videoFrame = insertShape(videoFrame, "polygon", bboxPolygon, "LineWidth", 2);
+
+        
+            transform = inv(xform.T.').' * transform;
+            
+             videoFrame = insertMarker(videoFrame,points(validity, :),'+');
+            videoFrame = imwarp(videoFrame,affine2d(transform),"OutputView",imref2d(size(videoFrame)));
+            
+
+
+      end
+
+      viejos=points;
+     end
+       step(videoPlayer, videoFrame);
+    
+end
+
+
+
+release(videoPlayer);
