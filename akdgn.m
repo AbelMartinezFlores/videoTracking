@@ -73,14 +73,9 @@ while hasFrame(videoReader)
 
         %ESTABILIZACIOn
         tform = estgeotform2d(oldInliers,visiblePoints,"similarity","MaxDistance",15);
-        auxtrans = [
-            (1/tform.Scale)*cosd(tform.RotationAngle) -(1/tform.Scale)*sind(tform.RotationAngle) 0
-            (1/tform.Scale)*sind(tform.RotationAngle) (1/tform.Scale)*cosd(tform.RotationAngle) 0
-            -tform.Translation(1) -tform.Translation(2) 1
-        ];
+        auxtrans = inv(tform.A).';
         transform = auxtrans * transform;
         videoFrame = imwarp(videoFrame,affine2d(transform),"OutputView",imref2d(size(videoFrame)));
-
     end
 
     % Display the annotated video frame using the video player object

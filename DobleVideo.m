@@ -1,68 +1,55 @@
-close all;
-clc;
-clear all;
+%PRUEBA VIDEO
+[hFig, hAxes] = createFigureAndAxes();
 
 % Create a cascade detector object.
 faceDetector = vision.CascadeObjectDetector();
 
 recortado = false;
-transform = [
-    1 0 0
-    0 1 0
-    0 0 1
-];
+transform = eye(3);
 
 % Read a video frame and run the face detector.
 videoReader = VideoReader("caras 1.avi");
-videoFrame      = readFrame(videoReader);
+videoFrame = readFrame(videoReader);
 
 indice = 1;
+
 numFrames = videoReader.NumFrames;
-disp(numFrames)
 
 %bbox            = step(faceDetector, videoFrame);
-figure; imshow(videoFrame);
-
+imshow(videoFrame);
 
 while hasFrame(videoReader)
 
+    %REBOBINADO Y RECORTADO
     if( recortado == false)
         waitforbuttonpress;
     end
-
-    % Obtener información sobre la tecla presionada
     key = get(gcf, 'CurrentCharacter');
-    disp(key)
-
-    if (key == 'd' & recortado == false & indice < numFrames )
+    if (key == 'd' & ~recortado & indice < numFrames )
         indice = indice + 1;
-        disp(indice);
         % Leer el siguiente fotograma
         videoFrame = read(videoReader, indice);
         % Mostrar el fotograma
         imshow(videoFrame);
         
     end
-
-    if (key == 'a' & recortado == false & indice > 1)
+    if (key == 'a' & ~recortado & indice > 1)
         indice = indice - 1;
-        disp(indice);
         % Leer el siguiente fotograma
         videoFrame = read(videoReader, indice);
         % Mostrar el fotograma
         imshow(videoFrame);
     end
 
+    %PLAY
     if (key == 'w' & recortado == false)
         %bbox = step(faceDetector, videoFrame);
 
         [a,b,c,bbox] = imcrop(videoFrame);
 
-
-
         % Draw the returned bounding box around the detected face.
         videoFrame = insertShape(videoFrame, "rectangle", bbox);
-        figure; imshow(videoFrame); title("Detected face");
+        %figure; imshow(videoFrame); title("Detected face");
         
         % Convert the first box into a list of 4 points
         % This is needed to be able to visualize the rotation of the object.
@@ -71,9 +58,8 @@ while hasFrame(videoReader)
         points = detectMinEigenFeatures(im2gray(videoFrame), "ROI", bbox);
         
         % Display the detected points.
-        figure, imshow(videoFrame), hold on, title("Detected features");
+        %figure, imshow(videoFrame), hold on, title("Detected features");
         plot(points);
-        
         
         pointTracker = vision.PointTracker("MaxBidirectionalError", 2);
         
@@ -90,6 +76,7 @@ while hasFrame(videoReader)
     end
 
     if recortado == true
+        
         % get the next frame
         videoFrame = readFrame(videoReader);
     
@@ -111,43 +98,31 @@ while hasFrame(videoReader)
                     
             % Insert a bounding box around the object being tracked
             bboxPolygon = reshape(bboxPoints', 1, []);
-            videoFrame = insertShape(videoFrame, "polygon", bboxPolygon, "LineWidth", 2);
+            videoTrack = insertShape(videoFrame, "polygon", bboxPolygon, "LineWidth", 2);
                     
             % Display tracked points
-            videoFrame = insertMarker(videoFrame, visiblePoints, "+", "Color", "white");       
+            videoTrack = insertMarker(videoTrack, visiblePoints, "+", "Color", "white");       
             
             % Reset the points
             oldPoints = visiblePoints;
-            setPoints(pointTracker, oldPoints); 
-
-            % poner toda la imagen en negro menos el bounding box
-            tam = size(videoFrame);
-            matriz = zeros(tam(1),tam(2), 'uint8');
-            
-            xmin = ceil(bboxPolygon(1));
-            xmax = ceil(bboxPolygon(5));
-            
-            ymin = ceil(bboxPolygon(2));
-            ymax = ceil(bboxPolygon(6));
-            
-            matriz(ymin:ymax, xmin:xmax) = 1;
-            videoFrame = videoFrame .* matriz;
+            setPoints(pointTracker, oldPoints);     
 
             %ESTABILIZACIOn
             tform = estgeotform2d(oldInliers,visiblePoints,"similarity","MaxDistance",15);
             auxtrans = inv(tform.A).';
             transform = auxtrans * transform;
-            videoFrame = imwarp(videoFrame,affine2d(transform),"OutputView",imref2d(size(videoFrame)));
+            videoEstabilizado = imwarp(videoFrame,affine2d(transform),"OutputView",imref2d(size(videoFrame)));
 
-        end
-        
-        
-        
+        end 
         % Display the annotated video frame using the video player object
-        step(videoPlayer, videoFrame);
+        %step(videoPlayer, videoFrame);
+        showFrameOnAxis(hAxes.axis1, imresize(videoFrame,0.25));
+        showFrameOnAxis(hAxes.axis2, imresize(videoTrack,0.25));
+        showFrameOnAxis(hAxes.axis3, imresize(videoEstabilizado,0.25));
+        %showFrameOnAxis(hAxes.axis1, frameOriginal);
+        %showFrameOnAxis(hAxes.axis2, frameTrack);
+        %showFrameOnAxis(hAxes.axis2, frameEstabilizado);
     end
-
-    
 end
 
 % Clean up
