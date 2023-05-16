@@ -1,0 +1,10 @@
+img = imread("cerdo.jpg");
+
+[a,b,c,rect] = imcrop(img);
+tam = size(img);
+matriz = zeros(tam(1),tam(2));
+
+matriz(rect(2):rect(2)+rect(4), rect(1):rect(1)+rect(3)) =
+
+imshow(matriz)
+

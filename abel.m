@@ -13,7 +13,7 @@ transform = [
 ];
 
 % Read a video frame and run the face detector.
-videoReader = VideoReader("obj 2.mp4");
+videoReader = VideoReader("caras 1.avi");
 videoFrame      = readFrame(videoReader);
 
 indice = 1;
@@ -58,6 +58,8 @@ while hasFrame(videoReader)
 
         [a,b,c,bbox] = imcrop(videoFrame);
 
+
+
         % Draw the returned bounding box around the detected face.
         videoFrame = insertShape(videoFrame, "rectangle", bbox);
         figure; imshow(videoFrame); title("Detected face");
@@ -71,7 +73,6 @@ while hasFrame(videoReader)
         % Display the detected points.
         figure, imshow(videoFrame), hold on, title("Detected features");
         plot(points);
-        
         
         
         pointTracker = vision.PointTracker("MaxBidirectionalError", 2);
@@ -117,19 +118,30 @@ while hasFrame(videoReader)
             
             % Reset the points
             oldPoints = visiblePoints;
-            setPoints(pointTracker, oldPoints);     
+            setPoints(pointTracker, oldPoints); 
+
+            % poner toda la imagen en negro menos el bounding box
+            tam = size(videoFrame);
+            matriz = zeros(tam(1),tam(2), 'uint8');
+            
+            xmin = ceil(bboxPolygon(1));
+            xmax = ceil(bboxPolygon(5));
+            
+            ymin = ceil(bboxPolygon(2));
+            ymax = ceil(bboxPolygon(6));
+            
+            matriz(ymin:ymax, xmin:xmax) = 1;
+            videoFrame = videoFrame .* matriz;
 
             %ESTABILIZACIOn
             tform = estgeotform2d(oldInliers,visiblePoints,"similarity","MaxDistance",15);
-            auxtrans = [
-                (1/tform.Scale)*cosd(tform.RotationAngle) -(1/tform.Scale)*sind(tform.RotationAngle) 0
-                (1/tform.Scale)*sind(tform.RotationAngle) (1/tform.Scale)*cosd(tform.RotationAngle) 0
-                -tform.Translation(1) -tform.Translation(2) 1
-            ];
+            auxtrans = inv(tform.A).';
             transform = auxtrans * transform;
             videoFrame = imwarp(videoFrame,affine2d(transform),"OutputView",imref2d(size(videoFrame)));
 
         end
+        
+        
         
         % Display the annotated video frame using the video player object
         step(videoPlayer, videoFrame);
