@@ -1,4 +1,4 @@
-function [videoOriginal, videoTrack, videoEstabilizado] = procesarVideo(videoReader,frameIdx,bbox)
+function [videoOriginal,videoTrack,videoEstabilizado,capturaPuntos,capturaBox] = procesarVideo(videoReader,frameIdx,bbox)
 transform = eye(3);
     for idx=1:(videoReader.NumFrames-frameIdx+1)
         frame=read(videoReader,frameIdx+idx-1);
@@ -6,7 +6,9 @@ transform = eye(3);
         videoOriginal{idx}=frame;
         videoTrack{idx}=frame;
         videoEstabilizado{idx}=frame;
-        
+        trackLight=frame;
+        stableLight=frame;
+
         if(idx==1)
             % Convert the first box into a list of 4 points
             % This is needed to be able to visualize the rotation of the object.
@@ -31,15 +33,20 @@ transform = eye(3);
             yminglobal = min(bboxPoints(:,2));
             xmaxglobal = max(bboxPoints(:,1));
             ymaxglobal = max(bboxPoints(:,2));            
+
+            capturaPuntos = frame;
+            capturaBox = frame;
         end
     
         % Track the points. Note that some points may be lost.
         [points, isFound] = step(pointTracker, videoOriginal{idx});
         visiblePoints = points(isFound, :);
         oldInliers = oldPoints(isFound, :);
+        if(idx==1)
+            capturaPuntos = insertMarker(capturaPuntos, visiblePoints, "+", "Color", "white");       
+        end
         
         if size(visiblePoints, 1) >= 2 % need at least 2 points
-            
             % Estimate the geometric transformation between the old points
             % and the new points and eliminate outliers
             [xform, inlierIdx] = estimateGeometricTransform2D(oldInliers, visiblePoints, "similarity", "MaxDistance", 4);
@@ -48,10 +55,13 @@ transform = eye(3);
             
             % Apply the transformation to the bounding box points
             bboxPoints = transformPointsForward(xform, bboxPoints);
-                    
-            % Insert a bounding box around the object being tracked
-            bboxPolygon = reshape(bboxPoints', 1, []);
-            videoOriginal{idx} = insertShape(videoOriginal{idx}, "polygon", bboxPolygon, "LineWidth", 2);
+           
+            if(idx==1)
+                % Insert a bounding box around the object being tracked
+                bboxPolygon = reshape(bboxPoints', 1, []);
+                capturaBox = insertShape(videoOriginal{idx}, "polygon", bboxPolygon, "LineWidth", 2);
+            end
+            
     
             % poner toda la imagen en negro menos el bounding box
             tam = size(videoOriginal{idx});
