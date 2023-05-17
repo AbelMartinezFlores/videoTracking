@@ -9,7 +9,7 @@ recortado = false;
 transform = eye(3);
 
 % Read a video frame and run the face detector.
-archivo="obj 3.mp4"
+archivo="caras 1.avi"
 videoReader = VideoReader(archivo);
 videoFrame = readFrame(videoReader);
 
@@ -86,9 +86,10 @@ while hasFrame(videoReader)
 
         figure(hFig);
         recortado=true;
-        indice=1;
+        break
     end
 end
+indice=1;
 auxi = size(videoTrack(:));
 aux =size(videoOriginal(:));
 while true
