@@ -9,7 +9,7 @@ recortado = false;
 transform = eye(3);
 
 % Read a video frame and run the face detector.
-archivo="caras 3.avi"
+archivo="obj 3.mp4"
 videoReader = VideoReader(archivo);
 videoFrame = readFrame(videoReader);
 
@@ -88,23 +88,26 @@ while hasFrame(videoReader)
         recortado=true;
         indice=1;
     end
-    if recortado == true
-        aux =size(videoOriginal(:));
-        if indice<aux(1)
-            auxi = size(videoTrack(:));
-            if indice<auxi(1)
-                frameTrack=videoTrack{indice};
-                frameEstabilizado=videoEstabilizado{indice};
-                showFrameOnAxis(hAxes.axis2, imresize(frameTrack,escaladoTrack));
-                showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,escaladoStable)); 
-            end
-            frameOriginal=videoOriginal{indice};
-            
-        
-            % Display the annotated video frame using the video player object
-            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,escaladoOriginal));
-                      
-            indice=indice+1;
+end
+auxi = size(videoTrack(:));
+aux =size(videoOriginal(:));
+while true
+    if indice<=aux(1)
+        if indice<auxi(1)
+            frameTrack=videoTrack{indice};
+            frameEstabilizado=videoEstabilizado{indice};
+            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,escaladoTrack));
+            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,escaladoStable)); 
         end
+        frameOriginal=videoOriginal{indice};
+        
+    
+        % Display the annotated video frame using the video player object
+        showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,escaladoOriginal));
+                  
+        indice=indice+1;
+    end
+    if(indice>aux(1))
+        indice=1;
     end
 end
