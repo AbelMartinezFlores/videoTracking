@@ -45,8 +45,10 @@ while hasFrame(videoReader)
     %PLAY
     if (key == 'w' & ~recortado)
         [a,b,c,bbox] = imcrop(videoFrame);
-
-        [videoOriginal,videoTrack,videoEstabilizado] = procesarVideo(videoReader,indice,bbox);
+        [videoOriginal,videoTrack,videoEstabilizado,capturaPuntos,capturaBox] = procesarVideo(videoReader,indice,bbox);
+        showFrameOnAxis(hAxes.pict1, imresize(capturaPuntos,0.3));
+        showFrameOnAxis(hAxes.pict2, imresize(capturaBox,0.3));
+        
         %exportarVideo
         writerTrack=VideoWriter(archivo+"-TRACK");
         writerEstabilizado=VideoWriter(archivo+"-STABLE");
@@ -73,9 +75,9 @@ while hasFrame(videoReader)
             frameEstabilizado=videoEstabilizado{indice};
         
             % Display the annotated video frame using the video player object
-            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,0.35));
-            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,0.35));
-            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,0.35));           
+            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,0.3));
+            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,0.3));
+            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,0.3));           
             indice=indice+1;
         end
     end
