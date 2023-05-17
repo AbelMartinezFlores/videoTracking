@@ -1,0 +1,28 @@
+% Create a cascade detector object.
+faceDetector = vision.CascadeObjectDetector();
+
+% Read a video frame and run the face detector.
+videoReader = VideoReader("caras 1.avi");
+videoFrame      = readFrame(videoReader);
+bbox            = step(faceDetector, videoFrame);
+
+% Draw the returned bounding box around the detected face.
+videoFrame = insertShape(videoFrame, "rectangle", bbox);
+figure; imshow(videoFrame); title("Detected face");
+
+while hasFrame(videoReader)
+    % get the next frame
+    videoFrame = readFrame(videoReader);
+    
+   % faceDetector = vision.CascadeObjectDetector();
+    gris = rgb2gray(videoFrame);
+
+    faceDetector.MergeThreshold = 7;
+    bbox = faceDetector(videoFrame);
+    detpic = insertObjectAnnotation(videoFrame, 'rectangle', bbox, 'Face');
+
+    imshow(detpic);
+end
+
+% Clean up
+release(videoPlayer);

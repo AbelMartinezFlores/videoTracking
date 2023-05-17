@@ -166,7 +166,16 @@ while hasFrame(videoReader)
     
 end
 
+for i=1:1: numFrames 
 
+    videoFrame = read(videoReader, indice);
+     % Mostrar el fotograma
+
+     videoFrame = imcrop(videoFrame, [xmin ymin (xmax-xmin) (ymax-ymin)]);
+     imshow(videoFrame);
+
+    
+end
 
 disp(xmin)
 disp(xmax)
