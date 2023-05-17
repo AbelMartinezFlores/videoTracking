@@ -91,7 +91,8 @@ while hasFrame(videoReader)
     if recortado == true
         aux =size(videoOriginal(:));
         if indice<aux(1)
-            if indice < size(videoTrack(:))
+            auxi = size(videoTrack(:));
+            if indice<auxi(1)
                 frameTrack=videoTrack{indice};
                 frameEstabilizado=videoEstabilizado{indice};
                 showFrameOnAxis(hAxes.axis2, imresize(frameTrack,escaladoTrack));
