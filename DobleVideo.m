@@ -9,7 +9,7 @@ recortado = false;
 transform = eye(3);
 
 % Read a video frame and run the face detector.
-archivo="caras 1.avi"
+archivo="caras 2.avi"
 videoReader = VideoReader(archivo);
 videoFrame = readFrame(videoReader);
 
@@ -74,12 +74,12 @@ while hasFrame(videoReader)
         writerTrack=VideoWriter(archivo+"-TRACK");
         writerEstabilizado=VideoWriter(archivo+"-STABLE");
         open(writerTrack);
-        for i=1:size(videoTrack(:));
+        for i=1:size(videoTrack(:))
             writeVideo(writerTrack,videoTrack{i});
         end
         close(writerTrack);
         open(writerEstabilizado);
-        for i=1:size(videoEstabilizado(:));
+        for i=1:size(videoEstabilizado(:))
             writeVideo(writerEstabilizado,videoEstabilizado{i});
         end
         close(writerEstabilizado);

@@ -4,10 +4,6 @@ transform = eye(3);
         frame=read(videoReader,frameIdx+idx-1);
         
         videoOriginal{idx}=frame;
-        videoTrack{idx}=frame;
-        videoEstabilizado{idx}=frame;
-        trackLight=frame;
-        stableLight=frame;
 
         if(idx==1)
             % Convert the first box into a list of 4 points
@@ -49,6 +45,9 @@ transform = eye(3);
         if size(visiblePoints, 1) >= 2 % need at least 2 points
             % Estimate the geometric transformation between the old points
             % and the new points and eliminate outliers
+            videoTrack{idx}=frame;
+            videoEstabilizado{idx}=frame;
+
             [xform, inlierIdx] = estimateGeometricTransform2D(oldInliers, visiblePoints, "similarity", "MaxDistance", 4);
             oldInliers    = oldInliers(inlierIdx, :);
             visiblePoints = visiblePoints(inlierIdx, :);
