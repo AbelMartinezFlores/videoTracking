@@ -1,25 +1,20 @@
 clc;
 clear all;
 close all;
-% Create a cascade detector object.
+%Creamos un detector de objetos en cascada
 faceDetector = vision.CascadeObjectDetector();
-
-% Read a video frame and run the face detector.
-videoReader = VideoReader("caras 1.avi");
+faceDetector.MergeThreshold = 8;
+% Iniciamos video
+videoReader = VideoReader("caras 2.avi");
 
 while hasFrame(videoReader)
-    % get the next frame
+    % Siguiente Frame
     videoFrame = readFrame(videoReader);
-    
-   % faceDetector = vision.CascadeObjectDetector();
+    %pasamos el frame a escala de grisas
     gris = rgb2gray(videoFrame);
-
-    faceDetector.MergeThreshold = 8;
-    bbox = faceDetector(videoFrame);
+    %detectamos las caras en la imagen de escala de gris
+    bbox = faceDetector(gris);
+    %dibujamos las cajas que se detectan
     detpic = insertObjectAnnotation(videoFrame, 'rectangle', bbox, 'Face');
-
     imshow(detpic);
 end
-
-% Clean up
-release(videoPlayer);
