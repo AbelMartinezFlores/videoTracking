@@ -74,8 +74,8 @@ transform = eye(3);
             %ymin = max(min(bboxPoints(:,2)),1);
             %xmax = min(max(bboxPoints(:,1)),tam(2));
             %ymax = min(max(bboxPoints(:,2)),tam(1));            
-            matriz(round(ymin):round(ymax), round(xmin):round(xmax)) = 1;
-            videoTrack{idx} = videoOriginal{idx} .* matriz;
+            %matriz(round(ymin):round(ymax), round(xmin):round(xmax)) = 1;
+            %videoTrack{idx} = videoOriginal{idx} .* matriz;
                     
             % Display tracked points
             %videoTrack{idx} = insertMarker(videoTrack(idx), visiblePoints, "+", "Color", "white");       

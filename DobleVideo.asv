@@ -45,37 +45,51 @@ while hasFrame(videoReader)
     %PLAY
     if (key == 'w' & ~recortado)
         [a,b,c,bbox] = imcrop(videoFrame);
+        [videoOriginal,videoTrack,videoEstabilizado,capturaPuntos,capturaBox] = procesarVideo(videoReader,indice,bbox);
 
-        [videoOriginal,videoTrack,videoEstabilizado] = procesarVideo(videoReader,indice,bbox);
+        %614 410
+        escaladoTrack = size(videoTrack{1});
+        escaladoStable = size(videoEstabilizado{1});
+        if(escaladoTrack(1)>escaladoTrack(2))
+            escaladoTrack = escaladoTrack(1)/614;
+        else
+            escaladoTrack = escaladoTrack(2)/4120;
+        end
+
+        showFrameOnAxis(hAxes.pict1, imresize(capturaPuntos,0.3));
+        showFrameOnAxis(hAxes.pict2, imresize(capturaBox,0.3));
+        
         %exportarVideo
         writerTrack=VideoWriter(archivo+"-TRACK");
         writerEstabilizado=VideoWriter(archivo+"-STABLE");
-        for i=1:size(videoTrack);
+        open(writerTrack);
+        for i=1:size(videoTrack(:));
             writeVideo(writerTrack,videoTrack{i});
+        end
+        close(writerTrack);
+        open(writerEstabilizado);
+        for i=1:size(videoEstabilizado(:));
             writeVideo(writerEstabilizado,videoEstabilizado{i});
         end
+        close(writerEstabilizado);
 
         figure(hFig);
         recortado=true;
         indice=1;
     end
-    if recortado == true        
-        frameOriginal=videoOriginal{indice};
-        frameTrack=videoTrack{indice};
-        frameEstabilizado=videoEstabilizado{indice};
-    
-        % Display the annotated video frame using the video player object
-        showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,0.35));
-        showFrameOnAxis(hAxes.axis2, imresize(frameTrack,0.35));
-        showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,0.35));
-        %waitforbuttonpress;
-        indice = indice + 1;
-        %if (key == 'd' && indice < numFrames )
-        %    indice = indice + 1;
-        %end
-        %if (key == 'a' && indice > 1)
-        %    indice = indice - 1;
-        %end
+    if recortado == true
+        aux =size(videoOriginal(:));
+        if indice<aux(1)
+            frameOriginal=videoOriginal{indice};
+            frameTrack=videoTrack{indice};
+            frameEstabilizado=videoEstabilizado{indice};
+        
+            % Display the annotated video frame using the video player object
+            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,0.3));
+            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,0.3));
+            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,0.3));           
+            indice=indice+1;
+        end
     end
 end
 

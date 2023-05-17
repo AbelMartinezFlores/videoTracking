@@ -46,8 +46,29 @@ while hasFrame(videoReader)
     if (key == 'w' & ~recortado)
         [a,b,c,bbox] = imcrop(videoFrame);
         [videoOriginal,videoTrack,videoEstabilizado,capturaPuntos,capturaBox] = procesarVideo(videoReader,indice,bbox);
-        showFrameOnAxis(hAxes.pict1, imresize(capturaPuntos,0.3));
-        showFrameOnAxis(hAxes.pict2, imresize(capturaBox,0.3));
+
+        %614 410
+        escaladoOriginal = size(videoOriginal{1});
+        escaladoTrack = size(videoTrack{1});
+        escaladoStable = size(videoEstabilizado{1});
+        if(escaladoOriginal(1)>escaladoOriginal(2))
+            escaladoOriginal = [614 NaN];
+        else
+            escaladoOriginal = [NaN 410];
+        end
+        if(escaladoTrack(1)>escaladoTrack(2))
+            escaladoTrack = [400 NaN];
+        else
+            escaladoTrack = [NaN 300];
+        end
+        if(escaladoStable(1)>escaladoStable(2))
+            escaladoStable = [400 NaN];
+        else
+            escaladoStable = [NaN 300];
+        end
+
+        showFrameOnAxis(hAxes.pict1, imresize(capturaPuntos,escaladoOriginal));
+        showFrameOnAxis(hAxes.pict2, imresize(capturaBox,escaladoOriginal));
         
         %exportarVideo
         writerTrack=VideoWriter(archivo+"-TRACK");
@@ -75,9 +96,9 @@ while hasFrame(videoReader)
             frameEstabilizado=videoEstabilizado{indice};
         
             % Display the annotated video frame using the video player object
-            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,0.3));
-            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,0.3));
-            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,0.3));           
+            showFrameOnAxis(hAxes.axis1, imresize(frameOriginal,escaladoOriginal));
+            showFrameOnAxis(hAxes.axis2, imresize(frameTrack,escaladoTrack));
+            showFrameOnAxis(hAxes.axis3, imresize(frameEstabilizado,escaladoStable));           
             indice=indice+1;
         end
     end
